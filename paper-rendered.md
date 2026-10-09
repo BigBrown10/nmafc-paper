@@ -1,6 +1,6 @@
 # Compaction, decay and reinforcement in a two-tier conversational memory: a paired evaluation against retrieval-augmented generation
 
-Osamudiamen Edogun, Joshua Obigwe. Independent researcher. edogunosamudiamen@gmail.com, joshuaobigwe@gmail.com. 10 September 2026.
+Osamudiamen Edogun (Independent researcher), Joshua Obigwe (Independent researcher), Irfan Mehmood (University of Bradford). edogunosamudiamen@gmail.com, joshuaobigwe@gmail.com, I.Mehmood4@bradford.ac.uk. 9 October 2026.
 
 
 ## Abstract
@@ -506,7 +506,7 @@ The list-shape gate cost 1,286 retrieved tokens against the shipped setting's 96
 ## Appendix F. Released files
 
 
-Table 9. Everything released alongside this paper. The three scripts share no state and none of them contacts a model.
+Table 9. The files released with the paper for recomputing every number and figure in it. The scripts share no state and none of them contacts a model.
 
 | File | Contents |
 |---|---|

@@ -318,6 +318,40 @@ def tex_escape(text: str) -> str:
     return "".join(TEX_ESCAPES.get(char, char) for char in text)
 
 
+def render_byline(meta: dict) -> dict[str, str]:
+    """Author, affiliation and email lines for the three outputs.
+
+    When author, affiliation and email carry the same comma count the
+    byline is per author: superscripted names over a marked affiliation
+    line in the PDF, name (affiliation) in the reading copies. Anything
+    else keeps the single shared line the flat source describes.
+    """
+    authors = [a.strip() for a in meta["author"].split(",")]
+    affils = [a.strip() for a in meta["affiliation"].split(",")]
+    emails = [e.strip() for e in meta["email"].split(",")]
+    if len(authors) != len(affils) or len(authors) != len(emails):
+        return {"tex_author": tex_escape(meta["author"]),
+                "tex_affil": tex_escape(meta["affiliation"]),
+                "md_author": f"{meta['author']}. {meta['affiliation']}",
+                "docx_author": f"{meta['author']}\n{meta['affiliation']}"}
+    order: list[str] = []
+    for affil in affils:
+        if affil not in order:
+            order.append(affil)
+    mark = {affil: str(i + 1) for i, affil in enumerate(order)}
+    tex_author = ", ".join(
+        tex_escape(name) + r"\textsuperscript{" + mark[affil] + "}"
+        for name, affil in zip(authors, affils))
+    tex_affil = r"\quad ".join(
+        r"\textsuperscript{" + mark[a] + "}" + tex_escape(a) for a in order)
+    paired = ", ".join(f"{name} ({affil})"
+                       for name, affil in zip(authors, affils))
+    return {"tex_author": tex_author,
+            "tex_affil": tex_affil,
+            "md_author": paired,
+            "docx_author": paired}
+
+
 def to_latex_inline(text: str) -> str:
     out = []
     for kind, content in split_spans(text):
@@ -496,10 +530,11 @@ def emit_latex(meta: dict, items: list, labels: dict) -> str:
             target.append("\n")
             continue
         target.append(latex_line(line, labels, used) + "\n")
+    byline = render_byline(meta)
     head = PREAMBLE % {
         "title": tex_escape(meta["title"]),
-        "author": tex_escape(meta["author"]),
-        "affiliation": tex_escape(meta["affiliation"]),
+        "author": byline["tex_author"],
+        "affiliation": byline["tex_affil"],
         "email": meta["email"], "date": meta["date"],
         "abstract": "".join(abstract).strip()}
     body = head + "".join(out)
@@ -566,8 +601,9 @@ def latex_block(block: Block, labels: dict, used: set[str]) -> str:
 
 def emit_markdown(meta: dict, items: list, labels: dict) -> str:
     used: set[str] = set()
+    byline = render_byline(meta)
     out = [f"# {meta['title']}\n",
-           f"\n{meta['author']}. {meta['affiliation']}. {meta['email']}.",
+           f"\n{byline['md_author']}. {meta['email']}.",
            f" {meta['date']}.\n"]
     for item in items:
         if isinstance(item, Block):
@@ -662,7 +698,7 @@ def emit_docx(meta: dict, items: list, labels: dict, path: pathlib.Path):
     run.font.size = Pt(16)
     byline = document.add_paragraph()
     byline.alignment = ALIGN.CENTER
-    byline.add_run(f"{meta['author']}\n{meta['affiliation']}\n"
+    byline.add_run(f"{render_byline(meta)['docx_author']}\n"
                    f"{meta['email']}\n{meta['date']}")
 
     used: set[str] = set()
