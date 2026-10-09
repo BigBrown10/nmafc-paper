@@ -292,7 +292,7 @@ The protocol is the part we would most like to see adopted: two arms, one window
 
 ## Data and code availability
 
-The per-question predictions of both arms, for every run quoted here, are released at https://github.com/blok-hamster/nmafc-paper, together with every script and JSON file listed in Appendix F. Every number in every table can be recomputed with `python analysis.py` and every figure with `python make_figures.py`, using the standard library, matplotlib and the released JSON. Neither script calls a model or requires an API key.
+The per-question predictions of both arms, for every run quoted here, are released at https://github.com/BigBrown10/nmafc-paper, together with every script and JSON file listed in Appendix F. Every number in every table can be recomputed with `python analysis.py` and every figure with `python make_figures.py`, using the standard library, matplotlib and the released JSON. Neither script calls a model or requires an API key.
 
 ## References
 
